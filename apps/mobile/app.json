@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "waste-hub-mobile",
+    "slug": "waste-hub-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wastehub.mobile"
+    },
+    "android": {
+      "package": "com.wastehub.mobile"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

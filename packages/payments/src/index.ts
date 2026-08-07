@@ -1,0 +1,5 @@
+export * from "./gateway.interface"
+export * from "./factory"
+export * from "./billing"
+export { PaystackGateway, type PaystackConfig } from "./gateways/paystack"
+export { FlutterwaveGateway, type FlutterwaveConfig } from "./gateways/flutterwave"
