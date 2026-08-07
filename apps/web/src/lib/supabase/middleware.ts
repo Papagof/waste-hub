@@ -1,6 +1,13 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
+// Routes reachable without a session. Everything else redirects to /login.
+const PUBLIC_PATH_PREFIXES = ["/login", "/signup", "/auth", "/api/webhooks"]
+
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+}
+
 /** Refreshes the Supabase auth session cookie on every request. Called from middleware.ts. */
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
@@ -27,7 +34,15 @@ export async function updateSession(request: NextRequest) {
   )
 
   // Required to keep the session alive — do not remove.
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const { pathname } = request.nextUrl
+  if (!user && pathname !== "/" && !isPublicPath(pathname)) {
+    const loginUrl = new URL("/login", request.url)
+    return NextResponse.redirect(loginUrl)
+  }
 
   return response
 }
