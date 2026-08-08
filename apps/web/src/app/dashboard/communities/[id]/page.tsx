@@ -2,7 +2,10 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Tables } from "@waste-hub/shared-types"
 import { createClient } from "@/lib/supabase/server"
+import { requireProfile } from "@/lib/auth/session"
+import { removeCommunityStaff } from "@/lib/community-staff/actions"
 import { CommunityForm } from "../community-form"
+import { AssignStaffForm } from "../staff-form"
 
 const COMPLIANCE_STYLES: Record<string, string> = {
   current: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
@@ -12,15 +15,25 @@ const COMPLIANCE_STYLES: Record<string, string> = {
   suspended: "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400",
 }
 
+const STAFF_ROLE_LABELS: Record<string, string> = {
+  manager: "Community Manager",
+  collector: "Field Agent / Collector",
+}
+
+type StaffRow = Tables<"community_staff"> & {
+  profiles: { full_name: string; email: string | null } | null
+}
+
 export default async function CommunityDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+  const { profile: currentProfile } = await requireProfile()
   const supabase = await createClient()
 
-  const [{ data: community }, { data: billingPlans }, { data: residents }, { data: statuses }] =
+  const [{ data: community }, { data: billingPlans }, { data: residents }, { data: statuses }, { data: staff }] =
     await Promise.all([
       supabase.from("communities").select("*").eq("id", id).maybeSingle<Tables<"communities">>(),
       supabase.from("billing_plans").select("*").eq("is_active", true).order("name").returns<Tables<"billing_plans">[]>(),
@@ -35,6 +48,13 @@ export default async function CommunityDetailPage({
         .select("*")
         .eq("community_id", id)
         .returns<Tables<"resident_payment_status">[]>(),
+      currentProfile.role === "super_admin"
+        ? supabase
+            .from("community_staff")
+            .select("*, profiles(full_name, email)")
+            .eq("community_id", id)
+            .returns<StaffRow[]>()
+        : Promise.resolve({ data: null }),
     ])
 
   if (!community) {
@@ -58,6 +78,42 @@ export default async function CommunityDetailPage({
           <CommunityForm community={community} billingPlans={billingPlans ?? []} />
         </div>
       </div>
+
+      {currentProfile.role === "super_admin" && (
+        <div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-zinc-950">
+          <h2 className="text-sm font-semibold text-black dark:text-zinc-50">Staff</h2>
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-500">
+            Managers and collectors assigned here get RLS-scoped access to this community&apos;s
+            residents and payments. The person must have signed up already.
+          </p>
+
+          <ul className="mt-4 flex flex-col divide-y divide-black/10 dark:divide-white/10">
+            {staff?.map((row) => (
+              <li key={row.id} className="flex items-center justify-between py-2 text-sm">
+                <span>
+                  <span className="font-medium text-black dark:text-zinc-50">
+                    {row.profiles?.full_name ?? "Unknown user"}
+                  </span>{" "}
+                  <span className="text-zinc-500 dark:text-zinc-500">({row.profiles?.email})</span> —{" "}
+                  {STAFF_ROLE_LABELS[row.staff_role]}
+                </span>
+                <form action={removeCommunityStaff.bind(null, row.id, id)}>
+                  <button type="submit" className="text-xs font-medium text-red-600 underline dark:text-red-400">
+                    Remove
+                  </button>
+                </form>
+              </li>
+            ))}
+            {!staff?.length && (
+              <li className="py-2 text-sm text-zinc-500 dark:text-zinc-500">No staff assigned yet.</li>
+            )}
+          </ul>
+
+          <div className="mt-4 border-t border-black/10 pt-4 dark:border-white/10">
+            <AssignStaffForm communityId={id} />
+          </div>
+        </div>
+      )}
 
       <div>
         <div className="flex items-center justify-between">

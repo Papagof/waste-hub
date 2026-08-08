@@ -5,6 +5,7 @@ export type PaymentStatus = Enums<"payment_status">
 export type PaymentMethod = Enums<"payment_method">
 export type PaymentGateway = Enums<"payment_gateway">
 export type UserRole = Enums<"user_role">
+export type StaffRole = Enums<"staff_role">
 export type ResidentStatus = Enums<"resident_status">
 export type ComplianceStatus = "current" | "grace_period" | "overdue" | ResidentStatus
 
@@ -14,6 +15,7 @@ export type BillingPlan = Tables<"billing_plans">
 export type Payment = Tables<"payments">
 export type CollectionLog = Tables<"collection_logs">
 export type Profile = Tables<"profiles">
+export type CommunityStaff = Tables<"community_staff">
 export type ResidentPaymentStatus = Tables<"resident_payment_status">
 export type CommunityPaymentSummary = Tables<"community_payment_summary">
 
