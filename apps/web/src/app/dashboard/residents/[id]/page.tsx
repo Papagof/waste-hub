@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { formatNaira, type Tables } from "@waste-hub/shared-types"
 import { createClient } from "@/lib/supabase/server"
 import { ResidentForm } from "../resident-form"
+import { RecordPaymentForm } from "../record-payment-form"
 
 export default async function ResidentDetailPage({
   params,
@@ -22,15 +23,26 @@ export default async function ResidentDetailPage({
     notFound()
   }
 
-  const [{ data: billingPlans }, { data: payments }] = await Promise.all([
-    supabase.from("billing_plans").select("*").eq("is_active", true).order("name").returns<Tables<"billing_plans">[]>(),
-    supabase
-      .from("payments")
-      .select("*")
-      .eq("resident_id", id)
-      .order("period_start", { ascending: false })
-      .returns<Tables<"payments">[]>(),
-  ])
+  const [{ data: activeBillingPlans }, { data: residentPlan }, { data: paymentStatus }, { data: payments }] =
+    await Promise.all([
+      supabase.from("billing_plans").select("*").eq("is_active", true).order("name").returns<Tables<"billing_plans">[]>(),
+      supabase
+        .from("billing_plans")
+        .select("*")
+        .eq("id", resident.billing_plan_id)
+        .maybeSingle<Tables<"billing_plans">>(),
+      supabase
+        .from("resident_payment_status")
+        .select("*")
+        .eq("resident_id", id)
+        .maybeSingle<Tables<"resident_payment_status">>(),
+      supabase
+        .from("payments")
+        .select("*")
+        .eq("resident_id", id)
+        .order("period_start", { ascending: false })
+        .returns<Tables<"payments">[]>(),
+    ])
 
   return (
     <div className="flex flex-col gap-8">
@@ -49,9 +61,24 @@ export default async function ResidentDetailPage({
       <div className="max-w-2xl rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-zinc-950">
         <h2 className="text-sm font-semibold text-black dark:text-zinc-50">Details</h2>
         <div className="mt-4">
-          <ResidentForm communityId={resident.community_id} resident={resident} billingPlans={billingPlans ?? []} />
+          <ResidentForm communityId={resident.community_id} resident={resident} billingPlans={activeBillingPlans ?? []} />
         </div>
       </div>
+
+      {residentPlan && (
+        <div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-zinc-950">
+          <h2 className="text-sm font-semibold text-black dark:text-zinc-50">Record payment</h2>
+          <div className="mt-4">
+            <RecordPaymentForm
+              residentId={id}
+              billingPlanId={residentPlan.id}
+              cycleType={residentPlan.cycle_type}
+              suggestedPeriodStart={paymentStatus?.next_due_date ?? resident.join_date}
+              suggestedAmountNaira={residentPlan.amount_kobo / 100}
+            />
+          </div>
+        </div>
+      )}
 
       <div>
         <h2 className="text-lg font-semibold text-black dark:text-zinc-50">Payment history</h2>
