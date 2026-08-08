@@ -81,7 +81,15 @@ export default async function ResidentDetailPage({
       )}
 
       <div>
-        <h2 className="text-lg font-semibold text-black dark:text-zinc-50">Payment history</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-black dark:text-zinc-50">Payment history</h2>
+          <a
+            href={`/api/exports/payments?residentId=${id}`}
+            className="text-sm font-medium text-black underline dark:text-zinc-50"
+          >
+            Export CSV
+          </a>
+        </div>
         <div className="mt-4 overflow-x-auto rounded-lg border border-black/10 dark:border-white/10">
           <table className="w-full min-w-max text-left text-sm">
             <thead className="border-b border-black/10 text-zinc-600 dark:border-white/10 dark:text-zinc-400">
@@ -90,6 +98,7 @@ export default async function ResidentDetailPage({
                 <th className="px-4 py-3 font-medium">Amount</th>
                 <th className="px-4 py-3 font-medium">Method</th>
                 <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium" />
               </tr>
             </thead>
             <tbody className="divide-y divide-black/10 dark:divide-white/10">
@@ -104,11 +113,21 @@ export default async function ResidentDetailPage({
                   </td>
                   <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{payment.method}</td>
                   <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{payment.status}</td>
+                  <td className="px-4 py-3">
+                    {payment.status === "paid" && (
+                      <Link
+                        href={`/dashboard/receipts/${payment.id}`}
+                        className="text-xs font-medium text-black underline dark:text-zinc-50"
+                      >
+                        Receipt
+                      </Link>
+                    )}
+                  </td>
                 </tr>
               ))}
               {!payments?.length && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-zinc-500 dark:text-zinc-500">
+                  <td colSpan={5} className="px-4 py-6 text-center text-zinc-500 dark:text-zinc-500">
                     No payments recorded yet.
                   </td>
                 </tr>

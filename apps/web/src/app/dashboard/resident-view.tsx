@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { BILLING_CYCLE_LABELS, formatNaira, type Tables } from "@waste-hub/shared-types"
 import { createClient } from "@/lib/supabase/server"
 import { ContactForm } from "./residents/contact-form"
@@ -152,6 +153,7 @@ export async function ResidentView({ userId }: { userId: string }) {
                     <th className="px-4 py-3 font-medium">Amount</th>
                     <th className="px-4 py-3 font-medium">Method</th>
                     <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-4 py-3 font-medium" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-black/10 dark:divide-white/10">
@@ -166,11 +168,21 @@ export async function ResidentView({ userId }: { userId: string }) {
                       </td>
                       <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{payment.method}</td>
                       <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{payment.status}</td>
+                      <td className="px-4 py-3">
+                        {payment.status === "paid" && (
+                          <Link
+                            href={`/dashboard/receipts/${payment.id}`}
+                            className="text-xs font-medium text-black underline dark:text-zinc-50"
+                          >
+                            Receipt
+                          </Link>
+                        )}
+                      </td>
                     </tr>
                   ))}
                   {!residentPayments.length && (
                     <tr>
-                      <td colSpan={4} className="px-4 py-6 text-center text-zinc-500 dark:text-zinc-500">
+                      <td colSpan={5} className="px-4 py-6 text-center text-zinc-500 dark:text-zinc-500">
                         No payments recorded yet.
                       </td>
                     </tr>

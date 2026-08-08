@@ -24,12 +24,20 @@ export default async function CommunitiesPage() {
             Estates and neighborhoods this account serves.
           </p>
         </div>
-        <Link
-          href="/dashboard/communities/new"
-          className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
-        >
-          New community
-        </Link>
+        <div className="flex gap-2">
+          <a
+            href="/api/exports/communities"
+            className="rounded-full border border-black/15 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-black/[.04] dark:border-white/15 dark:text-white dark:hover:bg-white/[.08]"
+          >
+            Export CSV
+          </a>
+          <Link
+            href="/dashboard/communities/new"
+            className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+          >
+            New community
+          </Link>
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-black/10 dark:border-white/10">
