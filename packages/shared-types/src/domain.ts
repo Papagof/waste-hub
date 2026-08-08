@@ -12,6 +12,7 @@ export type ComplaintCategory = Enums<"complaint_category">
 export type ComplaintStatus = Enums<"complaint_status">
 export type NotificationType = Enums<"notification_type">
 export type NotificationChannel = Enums<"notification_channel">
+export type CollectionStatus = Enums<"collection_status">
 
 export type Community = Tables<"communities">
 export type Resident = Tables<"residents">
