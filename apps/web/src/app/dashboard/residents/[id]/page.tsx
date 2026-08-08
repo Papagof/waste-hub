@@ -68,13 +68,23 @@ export default async function ResidentDetailPage({
       {residentPlan && (
         <div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-zinc-950">
           <h2 className="text-sm font-semibold text-black dark:text-zinc-50">Record payment</h2>
+          {paymentStatus?.compliance_status === "overdue" && residentPlan.late_fee_kobo > 0 && (
+            <p className="mt-1 text-xs text-[#d03b3b]">
+              This account is overdue — a {formatNaira(residentPlan.late_fee_kobo)} late fee has been added to the
+              suggested amount below.
+            </p>
+          )}
           <div className="mt-4">
             <RecordPaymentForm
               residentId={id}
               billingPlanId={residentPlan.id}
               cycleType={residentPlan.cycle_type}
               suggestedPeriodStart={paymentStatus?.next_due_date ?? resident.join_date}
-              suggestedAmountNaira={residentPlan.amount_kobo / 100}
+              suggestedAmountNaira={
+                (residentPlan.amount_kobo +
+                  (paymentStatus?.compliance_status === "overdue" ? residentPlan.late_fee_kobo : 0)) /
+                100
+              }
             />
           </div>
         </div>
