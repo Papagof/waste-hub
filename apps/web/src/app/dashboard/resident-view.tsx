@@ -1,5 +1,6 @@
 import { BILLING_CYCLE_LABELS, formatNaira, type Tables } from "@waste-hub/shared-types"
 import { createClient } from "@/lib/supabase/server"
+import { ContactForm } from "./residents/contact-form"
 
 const COMPLIANCE_STYLES: Record<string, string> = {
   current: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
@@ -111,6 +112,13 @@ export async function ResidentView({ userId }: { userId: string }) {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-zinc-950">
+              <h3 className="text-sm font-semibold text-black dark:text-zinc-50">Contact info</h3>
+              <div className="mt-4">
+                <ContactForm residentId={resident.id} phone={resident.phone} email={resident.email} />
               </div>
             </div>
 
