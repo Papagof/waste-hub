@@ -6,15 +6,21 @@ import { signOut } from "@/lib/auth/actions"
 // the data layer, this just keeps the nav from offering links a resident
 // or field agent can't use.
 const STAFF_ROLES = new Set(["super_admin", "community_manager", "accountant"])
+// Matches residents_select RLS (super_admin, manager, collector, accountant).
+const RESIDENTS_ROLES = new Set(["super_admin", "community_manager", "field_agent", "accountant"])
 // Matches complaints_select RLS (super_admin, manager, collector) — accountant
 // isn't part of that policy, so it's excluded here to avoid linking to an
 // always-empty page.
 const COMPLAINTS_ROLES = new Set(["super_admin", "community_manager", "field_agent"])
+// Matches collection_logs_select RLS (super_admin, manager, collector).
+const COLLECTIONS_ROLES = new Set(["super_admin", "community_manager", "field_agent"])
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { profile } = await requireProfile()
   const isStaff = STAFF_ROLES.has(profile.role)
+  const canSeeResidents = RESIDENTS_ROLES.has(profile.role)
   const canSeeComplaints = COMPLAINTS_ROLES.has(profile.role)
+  const canSeeCollections = COLLECTIONS_ROLES.has(profile.role)
 
   return (
     <div className="flex flex-1 flex-col bg-zinc-50 dark:bg-black">
@@ -33,6 +39,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
                   Billing Plans
                 </Link>
               </>
+            )}
+            {canSeeResidents && (
+              <Link href="/dashboard/residents" className="hover:text-black dark:hover:text-white">
+                Residents
+              </Link>
+            )}
+            {isStaff && (
+              <Link href="/dashboard/reminders" className="hover:text-black dark:hover:text-white">
+                Reminders
+              </Link>
+            )}
+            {canSeeCollections && (
+              <Link href="/dashboard/collections" className="hover:text-black dark:hover:text-white">
+                Collections
+              </Link>
             )}
             {canSeeComplaints && (
               <Link href="/dashboard/complaints" className="hover:text-black dark:hover:text-white">

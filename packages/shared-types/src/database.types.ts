@@ -280,6 +280,64 @@ export type Database = {
           },
         ]
       }
+      notification_log: {
+        Row: {
+          channel: Database["public"]["Enums"]["notification_channel"]
+          community_id: string
+          created_at: string
+          id: string
+          message: string
+          notification_type: Database["public"]["Enums"]["notification_type"]
+          resident_id: string | null
+          sent_by: string | null
+          status: string
+        }
+        Insert: {
+          channel: Database["public"]["Enums"]["notification_channel"]
+          community_id: string
+          created_at?: string
+          id?: string
+          message: string
+          notification_type: Database["public"]["Enums"]["notification_type"]
+          resident_id?: string | null
+          sent_by?: string | null
+          status?: string
+        }
+        Update: {
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          community_id?: string
+          created_at?: string
+          id?: string
+          message?: string
+          notification_type?: Database["public"]["Enums"]["notification_type"]
+          resident_id?: string | null
+          sent_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_log_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "resident_payment_status"
+            referencedColumns: ["resident_id"]
+          },
+          {
+            foreignKeyName: "notification_log_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "residents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_log_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_audit_log: {
         Row: {
           action: string
@@ -629,6 +687,11 @@ export type Database = {
         | "service_quality"
         | "other"
       complaint_status: "open" | "in_progress" | "resolved" | "closed"
+      notification_channel: "sms" | "email" | "log"
+      notification_type:
+        | "due_reminder"
+        | "overdue_reminder"
+        | "low_compliance_alert"
       payment_gateway: "paystack" | "flutterwave" | "manual"
       payment_method:
         | "cash"
@@ -793,6 +856,12 @@ export const Constants = {
         "other",
       ],
       complaint_status: ["open", "in_progress", "resolved", "closed"],
+      notification_channel: ["sms", "email", "log"],
+      notification_type: [
+        "due_reminder",
+        "overdue_reminder",
+        "low_compliance_alert",
+      ],
       payment_gateway: ["paystack", "flutterwave", "manual"],
       payment_method: ["cash", "card", "bank_transfer", "mobile_money", "ussd"],
       payment_status: [
