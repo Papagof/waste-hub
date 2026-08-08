@@ -48,4 +48,8 @@ create trigger on_auth_user_email_updated
   after update of email on auth.users
   for each row execute function public.handle_auth_user_email_change();
 
+-- Both PUBLIC (Postgres's own default on function creation) and the named
+-- roles (Supabase's default privileges) need revoking — see migration
+-- 20260807000020 for why revoking only one is not enough.
+revoke execute on function public.handle_auth_user_email_change() from public;
 revoke execute on function public.handle_auth_user_email_change() from anon, authenticated;

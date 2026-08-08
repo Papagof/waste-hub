@@ -508,6 +508,25 @@ export type Database = {
         Args: { cycle: Database["public"]["Enums"]["billing_cycle"] }
         Returns: number
       }
+      claim_my_resident_records: {
+        Args: never
+        Returns: {
+          billing_plan_id: string
+          community_id: string
+          created_at: string
+          email: string | null
+          full_name: string
+          house_unit_number: string
+          id: string
+          join_date: string
+          phone: string | null
+          profile_id: string | null
+          status: Database["public"]["Enums"]["resident_status"]
+          updated_at: string
+          virtual_account_bank: string | null
+          virtual_account_number: string | null
+        }[]
+      }
       current_role: {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
