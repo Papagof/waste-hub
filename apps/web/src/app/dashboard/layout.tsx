@@ -23,7 +23,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const canSeeCollections = COLLECTIONS_ROLES.has(profile.role)
 
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50 dark:bg-black">
+    <div className="flex flex-1 flex-col">
       <header className="border-b border-black/10 bg-white dark:border-white/10 dark:bg-zinc-950">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <nav className="flex items-center gap-6 text-sm font-medium text-zinc-700 dark:text-zinc-300">
