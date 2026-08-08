@@ -202,6 +202,84 @@ export type Database = {
           },
         ]
       }
+      complaints: {
+        Row: {
+          category: Database["public"]["Enums"]["complaint_category"]
+          community_id: string
+          created_at: string
+          description: string
+          id: string
+          resident_id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: Database["public"]["Enums"]["complaint_status"]
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["complaint_category"]
+          community_id?: string
+          created_at?: string
+          description: string
+          id?: string
+          resident_id: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: Database["public"]["Enums"]["complaint_status"]
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["complaint_category"]
+          community_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          resident_id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: Database["public"]["Enums"]["complaint_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaints_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "complaints_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "community_payment_summary"
+            referencedColumns: ["community_id"]
+          },
+          {
+            foreignKeyName: "complaints_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "resident_payment_status"
+            referencedColumns: ["resident_id"]
+          },
+          {
+            foreignKeyName: "complaints_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "residents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "complaints_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_audit_log: {
         Row: {
           action: string
@@ -545,6 +623,12 @@ export type Database = {
         | "half_yearly"
         | "yearly"
       collection_status: "completed" | "missed" | "rescheduled"
+      complaint_category:
+        | "missed_collection"
+        | "billing_issue"
+        | "service_quality"
+        | "other"
+      complaint_status: "open" | "in_progress" | "resolved" | "closed"
       payment_gateway: "paystack" | "flutterwave" | "manual"
       payment_method:
         | "cash"
@@ -702,6 +786,13 @@ export const Constants = {
         "yearly",
       ],
       collection_status: ["completed", "missed", "rescheduled"],
+      complaint_category: [
+        "missed_collection",
+        "billing_issue",
+        "service_quality",
+        "other",
+      ],
+      complaint_status: ["open", "in_progress", "resolved", "closed"],
       payment_gateway: ["paystack", "flutterwave", "manual"],
       payment_method: ["cash", "card", "bank_transfer", "mobile_money", "ussd"],
       payment_status: [

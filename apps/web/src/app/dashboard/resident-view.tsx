@@ -1,6 +1,21 @@
 import { BILLING_CYCLE_LABELS, formatNaira, type Tables } from "@waste-hub/shared-types"
 import { createClient } from "@/lib/supabase/server"
 import { ContactForm } from "./residents/contact-form"
+import { ComplaintForm } from "./residents/complaint-form"
+
+const COMPLAINT_CATEGORY_LABELS: Record<string, string> = {
+  missed_collection: "Missed collection",
+  billing_issue: "Billing issue",
+  service_quality: "Service quality",
+  other: "Other",
+}
+
+const COMPLAINT_STATUS_STYLES: Record<string, string> = {
+  open: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
+  in_progress: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+  resolved: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
+  closed: "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400",
+}
 
 const COMPLIANCE_STYLES: Record<string, string> = {
   current: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
@@ -46,7 +61,7 @@ export async function ResidentView({ userId }: { userId: string }) {
   }
 
   const residentIds = residents.map((r) => r.id)
-  const [{ data: statuses }, { data: payments }] = await Promise.all([
+  const [{ data: statuses }, { data: payments }, { data: complaints }] = await Promise.all([
     supabase
       .from("resident_payment_status")
       .select("*")
@@ -58,6 +73,12 @@ export async function ResidentView({ userId }: { userId: string }) {
       .in("resident_id", residentIds)
       .order("period_start", { ascending: false })
       .returns<Tables<"payments">[]>(),
+    supabase
+      .from("complaints")
+      .select("*")
+      .in("resident_id", residentIds)
+      .order("created_at", { ascending: false })
+      .returns<Tables<"complaints">[]>(),
   ])
   const statusByResident = new Map((statuses ?? []).map((s) => [s.resident_id, s]))
 
@@ -66,6 +87,7 @@ export async function ResidentView({ userId }: { userId: string }) {
       {residents.map((resident) => {
         const status = statusByResident.get(resident.id)
         const residentPayments = payments?.filter((p) => p.resident_id === resident.id) ?? []
+        const residentComplaints = complaints?.filter((c) => c.resident_id === resident.id) ?? []
 
         return (
           <div key={resident.id} className="flex flex-col gap-6">
@@ -155,6 +177,41 @@ export async function ResidentView({ userId }: { userId: string }) {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            <div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-zinc-950">
+              <h3 className="text-sm font-semibold text-black dark:text-zinc-50">Report an issue</h3>
+              <div className="mt-4">
+                <ComplaintForm residentId={resident.id} />
+              </div>
+
+              {residentComplaints.length > 0 && (
+                <ul className="mt-6 flex flex-col divide-y divide-black/10 dark:divide-white/10">
+                  {residentComplaints.map((complaint) => (
+                    <li key={complaint.id} className="flex items-start justify-between gap-4 py-3 text-sm">
+                      <div>
+                        <p className="text-black dark:text-zinc-50">
+                          {COMPLAINT_CATEGORY_LABELS[complaint.category] ?? complaint.category}
+                        </p>
+                        <p className="mt-0.5 text-zinc-600 dark:text-zinc-400">{complaint.description}</p>
+                        {complaint.resolution_notes && (
+                          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-500">
+                            Response: {complaint.resolution_notes}
+                          </p>
+                        )}
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${
+                          COMPLAINT_STATUS_STYLES[complaint.status] ??
+                          "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
+                        }`}
+                      >
+                        {complaint.status.replace("_", " ")}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         )

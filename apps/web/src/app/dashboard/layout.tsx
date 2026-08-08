@@ -6,10 +6,15 @@ import { signOut } from "@/lib/auth/actions"
 // the data layer, this just keeps the nav from offering links a resident
 // or field agent can't use.
 const STAFF_ROLES = new Set(["super_admin", "community_manager", "accountant"])
+// Matches complaints_select RLS (super_admin, manager, collector) — accountant
+// isn't part of that policy, so it's excluded here to avoid linking to an
+// always-empty page.
+const COMPLAINTS_ROLES = new Set(["super_admin", "community_manager", "field_agent"])
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { profile } = await requireProfile()
   const isStaff = STAFF_ROLES.has(profile.role)
+  const canSeeComplaints = COMPLAINTS_ROLES.has(profile.role)
 
   return (
     <div className="flex flex-1 flex-col bg-zinc-50 dark:bg-black">
@@ -28,6 +33,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
                   Billing Plans
                 </Link>
               </>
+            )}
+            {canSeeComplaints && (
+              <Link href="/dashboard/complaints" className="hover:text-black dark:hover:text-white">
+                Complaints
+              </Link>
             )}
           </nav>
           <div className="flex items-center gap-4">

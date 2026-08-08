@@ -8,6 +8,8 @@ export type UserRole = Enums<"user_role">
 export type StaffRole = Enums<"staff_role">
 export type ResidentStatus = Enums<"resident_status">
 export type ComplianceStatus = "current" | "grace_period" | "overdue" | ResidentStatus
+export type ComplaintCategory = Enums<"complaint_category">
+export type ComplaintStatus = Enums<"complaint_status">
 
 export type Community = Tables<"communities">
 export type Resident = Tables<"residents">
@@ -16,6 +18,7 @@ export type Payment = Tables<"payments">
 export type CollectionLog = Tables<"collection_logs">
 export type Profile = Tables<"profiles">
 export type CommunityStaff = Tables<"community_staff">
+export type Complaint = Tables<"complaints">
 export type ResidentPaymentStatus = Tables<"resident_payment_status">
 export type CommunityPaymentSummary = Tables<"community_payment_summary">
 
