@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.5.2",
+    "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.45.0",
     "@waste-hub/payments": "*",
     "@waste-hub/shared-types": "*",
