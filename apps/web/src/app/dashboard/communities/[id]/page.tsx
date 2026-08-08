@@ -118,12 +118,20 @@ export default async function CommunityDetailPage({
       <div>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-black dark:text-zinc-50">Residents</h2>
-          <Link
-            href={`/dashboard/communities/${id}/residents/new`}
-            className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
-          >
-            Add resident
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href={`/dashboard/communities/${id}/residents/import`}
+              className="rounded-full border border-black/15 px-5 py-2 text-sm font-medium text-black transition-colors hover:bg-black/[.04] dark:border-white/15 dark:text-white dark:hover:bg-white/[.08]"
+            >
+              Bulk import
+            </Link>
+            <Link
+              href={`/dashboard/communities/${id}/residents/new`}
+              className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+            >
+              Add resident
+            </Link>
+          </div>
         </div>
 
         <div className="mt-4 overflow-x-auto rounded-lg border border-black/10 dark:border-white/10">
